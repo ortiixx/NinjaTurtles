@@ -19,6 +19,7 @@ void Damageable::Die() {
 	Entity* e = Scene::GetEntity(entityId);
 	Sprite* spr = (Sprite*)e->GetComponent("Sprite");
 	spr->Die();
+	Scene::GetEntity(entityId)->setDead();
 }
 
 Damageable::~Damageable()

@@ -3,6 +3,8 @@
 #include "ShaderProgram.h"
 #include "Texture.h"
 #include "Sprite.h"
+#include <glm/glm.hpp>
+
 class Enemy : public Entity
 {
 public:
@@ -11,8 +13,13 @@ public:
 	Texture tex;
 	~Enemy();
 private:
+	float attackTimer = 0;
 	Sprite* spr;
 	glm::ivec2 vel = glm::ivec2(0);
-	Entity* player;
+	Entity* player = nullptr;
+	enum State;
+	State currentState;
+	glm::ivec2 CalculateDir();
+	void Attack();
 };
 

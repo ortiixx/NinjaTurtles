@@ -109,16 +109,14 @@ void Sprite::setAnimation(int animId, int sKey, int length, int keyframesPerSec,
 	Anim a;
 	a.startframe = sKey;
 	a.keyframes = length;
-	a.speed = keyframesPerSec;
+	a.speed = 1000.f / keyframesPerSec;
 	a.once = once;
-	if(animId < int(animations.size()))
-		animations[animId].speed =  keyframesPerSec / 1000.f;
 	animations[animId] = a;
 }
 
 void Sprite::changeAnimation(int animId)
 {
-	if (currentAnimation >= 0 && animations[currentAnimation].once) return;
+	if (animId != dieAnim && (currentAnimation >= 0 && animations[currentAnimation].once && !animations[animId].once)) return;
 		currentAnimation = animId;
 		playingOnce = false;
 }

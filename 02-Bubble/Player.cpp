@@ -13,10 +13,23 @@
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
 #define INPUT_SENSITIVITY 2
-#define ATTACK_RANGE 2
-#define DAMAGE_AMMOUNT 20
+#define ATTACK_RANGE 20
+#define FAST_DAMAGE_AMMOUNT 5
+#define SLOW_DAMAGE_AMMOUNT 20
 #define FORCE 20
 #define ATTACK_TIMER 600
+#define JUMP_HEIGHT 13
+const double pi = 3.14159265358979323846;
+
+
+/*
+CONTROLS:
+Z- FAST ATTACK
+X- SLOW ATTACK
+C- JUMP
+V- ROLL
+*/
+
 
 enum PlayerAnims
 {
@@ -26,7 +39,14 @@ enum PlayerAnims
 	WALK2,
 	HIT,
 	ROLL,
-	ATTACK1
+	ROLL2,
+	ATTACK1,
+	ATTACK2,
+	JUMP_ATTACK1,
+	JUMP_ATTACK2,
+	HIT1,
+	HITHARD,
+	DIE
 };
 
 enum Player::Dir
@@ -34,32 +54,40 @@ enum Player::Dir
 	LOOKING_LEFT, LOOKING_RIGHT
 };
 
-void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
+void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
-	attackTimer = 0;
 	bJumping = false;
 	lookDir = LOOKING_RIGHT;
 	spritesheet.loadFromFile("images/Characters/donatello.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	transform.SetPosition(glm::vec2(69, 69));
-	AddComponent(new Sprite (glm::ivec2(128, 128), glm::dvec2(1.f/9.f, 1.f/14.f), 9, 21, &spritesheet, &shaderProgram));
-	AddComponent(new Collider(glm::ivec2(128/4, 128/3)));
+	AddComponent(new Sprite (glm::fvec2(128, 128), glm::dvec2(1.f/9.f, 1.f/14.f), 9, 21, &spritesheet, &shaderProgram));
+	AddComponent(new Collider(glm::fvec2(128/4, 128/3)));
+	AddComponent(new Damageable(0));
 	sprite = (Sprite*)GetComponent("Sprite");
-	sprite->setAnimation(IDLE, 0, 5, 490, false);
-	sprite->setAnimation(WALK1, 59, 8, 160, false);
-	sprite->setAnimation(WALK2, 67, 8, 160, false);
-	sprite->setAnimation(ATTACK1, 17, 4, 230, true);
+	sprite->setAnimation(IDLE, 0, 5, 3, false);
+	sprite->setAnimation(WALK1, 59, 8, 3, false);
+	sprite->setAnimation(WALK2, 67, 8, 3, false);
+	sprite->setAnimation(ATTACK1, 17, 4, 3, true);
+	sprite->setAnimation(ATTACK2, 20, 7, 3, true);
+	sprite->setAnimation(JUMP_ATTACK2, 52, 7, 3, true);
+	sprite->setAnimation(JUMP_ATTACK1, 46, 3, 3, true);
+	sprite->setAnimation(ROLL, 36, 10, 3, true);
+	sprite->setAnimation(ROLL2, 36, 10, 3, true);
+	sprite->setAnimation(HIT1, 36, 10, 3, true);
+	sprite->setAnimation(HITHARD, 112, 10, 3, true);
+	sprite->setAnimation(DIE, 85, 6, 3, true);
+	sprite->setDieAnim(DIE);
 	tileMapDispl = tileMapPos;
 	friction = glm::vec2(2,3);
 	transform.SetPosition(glm::vec2(float(tileMapDispl.x), float(tileMapDispl.y)));
+	jumpMax = 2 * pi;
 }
 
-void Player::Attack() {
-	if (attackTimer < ATTACK_TIMER) return;
-	sprite->changeAnimation(ATTACK1);
-	attackTimer = 0;
+void Player::Attack(float damage) {
+
 	PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
-	glm::ivec2 pos = transform.GetPosition() + glm::ivec2(ATTACK_RANGE, 0) * transform.GetScale().x;
-	glm::ivec2 bounds = glm::ivec2(128 / 2);
+	glm::fvec2 pos = transform.GetPosition() + glm::fvec2(ATTACK_RANGE, 0) * transform.GetScale().x;
+	glm::fvec2 bounds = glm::fvec2(128 / 3);
 	std::vector<Collider*> ign;
 	ign.push_back((Collider*)GetComponent("Collider"));
 	std::vector<Collider*> cols = ps->CastCollision(pos, bounds, ign);
@@ -67,24 +95,28 @@ void Player::Attack() {
 		Entity* e = Scene::GetEntity(cols[i]->getEntityId());
 		if (e == nullptr) continue;
 		Damageable* dmg = (Damageable*)e->GetComponent("Damageable");
-		glm::ivec2 dir = glm::ivec2(FORCE*3, 0) * transform.GetScale().x;
+		glm::fvec2 dir = glm::fvec2(FORCE, 0) * transform.GetScale().x;
 		if (dmg != nullptr)
-			dmg->AddDamage(DAMAGE_AMMOUNT, dir);
+			dmg->AddDamage(damage, dir);
 	}
-}
-int Jump(int x) {
-	int a, b, c;
-	a = b = c = 2;
-	return a * pow(x, 2) + b * x + c;
 }
 
 void Player::update(int deltaTime)
 {
-	attackTimer += deltaTime;
-	if (jumpAdd > 0) jumpAdd -= 1;
-	sprite->update(deltaTime);
 	Entity::update(deltaTime);
-	glm::ivec2 inp = glm::ivec2(0, 0);
+	if (!alive) return;
+	bool attacking = sprite->animation() == ATTACK1 || sprite->animation() == ATTACK2;
+	bool rolling = sprite->animation() == ROLL2;
+	if (bJumping) {
+		jumpTime += 0.2;
+		vel.y -= sin(jumpTime) * JUMP_HEIGHT;
+		if (jumpTime > jumpMax) {
+			vel.y -= sin(jumpMax) * JUMP_HEIGHT;
+			bJumping = false;
+		}
+	}
+	if (sprite->animation() == ROLL2) vel.x += 2* transform.GetScale().x;
+	glm::fvec2 inp = glm::fvec2(0, 0);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
 		lookDir = LOOKING_LEFT;
@@ -102,27 +134,38 @@ void Player::update(int deltaTime)
 	if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
 		inp.y -= INPUT_SENSITIVITY;
 	}
-	if (Game::instance().getKey(' ')) {
-		jumpAdd = jumpMax;
+	if (Game::instance().getSpecialKey(GLUT_ACTIVE_CTRL)) {
+		inp.y -= INPUT_SENSITIVITY;
 	}
-	if (Game::instance().getKey('z')|| Game::instance().getKey('Z')) {
-		Attack();
+	if (!rolling && !bJumping && Game::instance().getKey('c')) {
+		sprite->changeAnimation(ROLL);
+		bJumping = true;
+		jumpTime = 0;
 	}
-	vel.y = Jump(-jumpAdd);
+	if (!rolling && !attacking && Game::instance().getKey('z')) {
+		if (bJumping) { sprite->changeAnimation(JUMP_ATTACK1);}
+		else sprite->changeAnimation(ATTACK1);
+		Attack(FAST_DAMAGE_AMMOUNT);
+	}
+	if (!rolling && !attacking && Game::instance().getKey('x')) {
+		//if (bJumping) sprite->changeAnimation(JUMP_ATTACK2);
+		sprite->changeAnimation(ATTACK2);
+		Attack(SLOW_DAMAGE_AMMOUNT);
+	}
+	if (sprite->animation() != ROLL && !bJumping && Game::instance().getKey('v')) {
+		sprite->changeAnimation(ROLL2);
+	}
 	if (lookDir == LOOKING_LEFT)
 		transform.SetScale(glm::vec2(-1,1));
 	else transform.SetScale(glm::vec2(1, 1));
 	vel += inp;
-	glm::ivec2 posPlayer = transform.GetPosition();
-	posPlayer += vel;
-	if (abs(vel.x) > 0.25) 
+	if (abs(vel.x) > 0.25 || abs(vel.y) > 0.25)
 		sprite->changeAnimation(WALK1);
 	if (vel.y < -0.25)
 		sprite->changeAnimation(WALK2);
-	else if(abs(vel.x) < 0.25 && abs(vel.y) < 0.25)
+	if(abs(vel.x) < 0.25 && abs(vel.y) < 0.25)
 		sprite->changeAnimation(IDLE);
-	//transform->position += (glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	transform.SetPosition(transform.GetPosition() + vel);
+	transform.SetPosition(transform.GetPosition() + vel * deltaTime/1000);
 	vel /= friction; //Lastly, we apply the friction
 }
 

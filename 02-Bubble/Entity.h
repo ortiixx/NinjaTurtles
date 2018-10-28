@@ -17,10 +17,12 @@ public:
 	void AddComponent(EntityComponent* comp);
 	virtual void update(int deltaTime);
 	virtual void render();
+	void setDead() { alive = false; }
 	void setId(int id);
 	Transform transform;
 protected:
 	std::vector <EntityComponent*> components;
+	bool alive = true;
 	glm::ivec2 position;
 	glm::ivec2 scale;
 	int id; 

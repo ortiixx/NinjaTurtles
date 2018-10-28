@@ -80,7 +80,7 @@ void Scene::init()
 	en->transform.SetPosition(player->transform.GetPosition() + glm::ivec2(160, 0));
 
 	//Adding Entities
-	AddEntity(player);
+	AddEntity(player); //Player always the first entity
 	AddEntity(bl);
 	AddEntity(en);
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);

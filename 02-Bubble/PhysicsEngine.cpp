@@ -34,8 +34,9 @@ std::vector<Collider*> PhysicsEngine::CastCollision(glm::ivec2 pos, glm::ivec2 b
 	c1->transform = new Transform(pos, glm::ivec2(1, 1));
 	for (int i = 0; i < sceneColliders.size(); i++) {
 		Collider* c2 = sceneColliders[i];
-		for (int j = 0; j < ignore.size(); j++)
-			if (c2 == ignore[j]) continue;
+		bool b = false;
+		for (int j = 0; j < ignore.size(); j++) if (c2 == ignore[j]) b = true;
+		if (b) continue;
 		if (checkConflict(c1, c2))
 			output.push_back(c2);
 	}
