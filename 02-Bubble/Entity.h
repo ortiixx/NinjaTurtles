@@ -17,11 +17,11 @@ public:
 	void AddComponent(EntityComponent* comp);
 	virtual void update(int deltaTime);
 	virtual void render();
+	void setId(int id);
 	Transform transform;
-
 protected:
 	std::vector <EntityComponent*> components;
 	glm::ivec2 position;
 	glm::ivec2 scale;
+	int id; 
 };
-

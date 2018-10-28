@@ -3,20 +3,20 @@
 #include <vector>
 #include "Collider.h"
 
-class PhysicsEngine
+static class PhysicsEngine
 {
 public:
 	
-	PhysicsEngine();
 	~PhysicsEngine();
 	void AddSceneCollider(Collider* c);
+	void RemoveSceneCollider(Collider* c);
 	void physicsLoop();
 	static PhysicsEngine* PhysicsGetInstance() {
 		if (instance == nullptr) 
 			instance = new PhysicsEngine();
 		return instance;
 	}
-	std::vector<Collider * > CastCollision(Collider c);
+	std::vector<Collider * > CastCollision(glm::ivec2 pos, glm::ivec2 bounds, const std::vector<Collider *> &ignore);
 
 private:
 	std::vector<Collider * > sceneColliders;
@@ -24,4 +24,5 @@ private:
 	void solveConflict(Collider* c1, Collider* c2);
 	bool checkConflict(Collider* c1, Collider* c2);
 	static PhysicsEngine* instance;
+	PhysicsEngine();
 };

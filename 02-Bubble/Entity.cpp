@@ -25,6 +25,12 @@ void Entity::render() {
 	spr->render();
 }
 
+void Entity::setId(int id)
+{
+	for (int i = 0; i < components.size(); i++)
+		components[i]->setEntityId(id);
+}
+
 void Entity::AddComponent(EntityComponent* comp) {
 	components.push_back(comp);
 	comp->transform = &transform;

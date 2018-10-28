@@ -13,22 +13,23 @@ class Sprite : public EntityComponent
 
 public:
 	// Textured quads can only be created inside an OpenGL context
-	static Sprite *createSprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, int columns, int animations, Texture *spritesheet, ShaderProgram *program);
-
 	Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, int columns, int animations, Texture *spritesheet, ShaderProgram *program);
 	Sprite();
 	void update(int deltaTime);
 	void render() const;
 	void free();
-
 	void setNumberAnimations(int nAnimations);
-	void setAnimation(int animId, int sKey, int length, int keyframesPerSec);
+	void setAnimation(int animId, int sKey, int length, int keyframesPerSec, bool once);
 	void changeAnimation(int animId);
+	void setDieAnim(int anim) { dieAnim = anim; }
+	void Die();
 	int animation() const;
+	float layer = 0;
 
 private:
 	struct Anim {
 		float speed;
+		bool once;
 		int keyframes;
 		int startframe;
 	};
@@ -44,7 +45,10 @@ private:
 	glm::fvec2 texCoordDispl;
 	int currentAnimation;
 	int currentFrame;
+	int dieAnim = -10;
 	vector<Anim> animations;
+	glm::ivec2 position, scale;
+	bool playingOnce = false;
 };
 
 

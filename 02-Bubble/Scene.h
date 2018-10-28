@@ -9,6 +9,7 @@
 #include "Entity.h"
 #include "Collider.h"
 #include "PhysicsEngine.h"
+#include <map>
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
@@ -23,21 +24,24 @@ public:
 	void update(int deltaTime);
 	void render();
 	void UpdateSceneColliders();
+	void AddEntity(Entity* ent);
+	static Entity* GetEntity(int id);
+	static void RemoveEntity(int id);
 private:
 	void initShaders();
 	void moveCamera();
 
-
 private:
 	float camPX;
 	float camPY;
+	int lastId = 0;
 	TileMap *map;
 	Player *player;
 	ShaderProgram texProgram;
-	PhysicsEngine* ps;
+    static	PhysicsEngine* ps;
 	float currentTime;
 	glm::mat4 projection;
-	std::vector<Entity*> entities;
+	static std::map<int, Entity*> entities;
 };
 
 

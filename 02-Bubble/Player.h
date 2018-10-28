@@ -17,8 +17,10 @@ public:
 	void update(int deltaTime);
 	void render();
 	void setTileMap(TileMap *tileMap);
-	
+	void Attack();
 private:
+	int jumpMax = 10;
+	int jumpAdd = 0;
 	Sprite* sprite;
 	bool bJumping;
 	enum Dir;
@@ -27,6 +29,7 @@ private:
 	Texture spritesheet;
 	TileMap *map;
 	int lookDir;
+	int attackTimer;
 };
 
 

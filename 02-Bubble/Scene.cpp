@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Game.h"
 #include "Block.h"
+#include "Enemy.h"
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -11,7 +12,7 @@
 #define INIT_PLAYER_X_TILES 4
 #define INIT_PLAYER_Y_TILES 25
 
-PhysicsEngine* PhysicsEngine::instance = nullptr;
+std::map<int, Entity*> Scene::entities = std::map<int, Entity*>();
 
 Scene::Scene()
 {
@@ -27,25 +28,61 @@ Scene::~Scene()
 		delete player;
 }
 
+Entity* Scene::GetEntity(int id) {
+	if(!entities.count(id)) return nullptr;
+	return entities[id];
+}
+
+PhysicsEngine* Scene::ps = PhysicsEngine::PhysicsGetInstance();
+
+
+void Scene::RemoveEntity(int id)
+{
+	if (!entities.count(id)) return;
+	Entity* ent = entities[id];
+	Collider* c = (Collider*)ent->GetComponent("Collider");
+	if (c != nullptr) {
+		//PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
+		ps->RemoveSceneCollider(c);
+	}
+	entities.erase(id);
+	
+}
+
 void Scene::UpdateSceneColliders() {
-	for (int i = 0; i < entities.size(); i++) {
-		Collider* c = (Collider *)entities[i]->GetComponent("Collider");
+
+	for (auto const& x : entities) {
+		Collider* c = (Collider *)x.second->GetComponent("Collider");
 		if (c != nullptr) ps->AddSceneCollider(c);
 	}
+}
+
+void Scene::AddEntity(Entity * ent)
+{
+	std::pair<int, Entity*> p;
+	ent->setId(lastId);
+	p.first = lastId;
+	p.second = ent;
+	entities.insert(p);
+	lastId += 1;
 }
 
 void Scene::init()
 {
 	initShaders();
-	ps = PhysicsEngine::PhysicsGetInstance();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setTileMap(map);
 	Block* bl = new Block(texProgram);
-	bl->transform.SetPosition(player->transform.GetPosition());
-	entities.push_back(player);
-	entities.push_back(bl);
+	bl->transform.SetPosition(player->transform.GetPosition()+glm::ivec2(80,0));
+	Enemy* en = new Enemy(texProgram);
+	en->transform.SetPosition(player->transform.GetPosition() + glm::ivec2(160, 0));
+
+	//Adding Entities
+	AddEntity(player);
+	AddEntity(bl);
+	AddEntity(en);
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	UpdateSceneColliders();
@@ -54,8 +91,8 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	for (int i = 0; i < entities.size(); i++)
-		entities[i]->update(deltaTime);
+	for (auto const& x : entities) 
+		x.second->update(deltaTime);
 	projection = glm::translate(projection, glm::vec3(camPX, 0, camPY));
 	moveCamera();
 	ps->physicsLoop();
@@ -64,8 +101,8 @@ void Scene::update(int deltaTime)
 void Scene::render()
 {
 	glm::mat4 modelview;
-	for (int i = 0; i < entities.size(); i++)
-		entities[i]->render();
+	for (auto const& x : entities)
+		x.second->render();
 	texProgram.use();
 	texProgram.setUniformMatrix4f("projection", projection);
 	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
