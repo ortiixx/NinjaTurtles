@@ -37,5 +37,5 @@ void Entity::AddComponent(EntityComponent* comp) {
 }
 
 Entity::Entity() {
-	transform = Transform(glm::ivec2(0, 0), glm::ivec2(1, 1));
+	transform = Transform(glm::fvec2(0, 0), glm::fvec2(1, 1));
 }

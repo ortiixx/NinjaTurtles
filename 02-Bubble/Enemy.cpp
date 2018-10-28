@@ -5,7 +5,7 @@
 #include "Damageable.h"
 #include "Scene.h"
 
-#define ATTACK_DELAY 500
+#define ATTACK_DELAY 600
 #define ATTACK_RANGE 30
 #define ATTACK_DIST 30
 #define DAMAGE 30
@@ -26,12 +26,12 @@ Enemy::Enemy(ShaderProgram &shaderProgram)
 	currentState = CHASE;
 	tex.loadFromFile("images/Characters/Ninja_pink.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spr = new Sprite(glm::fvec2(128, 128), glm::dvec2(1.f / 5.f, 1.f / 3.f), 5, 3, &tex, &shaderProgram);
-	AddComponent(new Collider(glm::fvec2(128/3, 128/2)));
-	AddComponent(new Damageable(30));
+	AddComponent(new Collider(glm::fvec2(128/2, 128/2)));
+	AddComponent(new Damageable(300));
 	AddComponent(spr);
-	spr->setAnimation(WALK, 0, 5,6, false);
+	spr->setAnimation(WALK, 0, 5,9, false);
 	spr->setAnimation(ATTACK, 5, 5, 5, true);
-	spr->setAnimation(DIE, 10, 5, 4, true);
+	spr->setAnimation(DIE, 10, 5, 7, true);
 	spr->changeAnimation(WALK);
 	spr->setDieAnim(DIE);
 }
@@ -48,7 +48,7 @@ glm::fvec2 Enemy::CalculateDir() {
 
 void Enemy::Attack() {
 	PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
-	glm::fvec2 pos = transform.GetPosition() + CalculateDir() * ATTACK_RANGE;
+	glm::fvec2 pos = transform.GetPosition() + CalculateDir();
 	glm::fvec2 bounds = glm::fvec2(128 / 3);
 	std::vector<Collider*> ign;
 	ign.push_back((Collider*)GetComponent("Collider"));
@@ -68,10 +68,13 @@ void Enemy::update(int deltaTime) {
 	if (!alive) return;
 	if (player == nullptr) player = Scene::GetEntity(0); //Player always the first entity
 
-	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST)
+	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST) {
 		currentState = ATTACK;
-	else if(spr->animation() !=  ATTACK)
+	}
+	else if (spr->animation() != ATTACK) {
 		currentState = CHASE;
+		attackTimer = 0;
+	}
 	if (spr->animation() == ATTACK) {
 		attackTimer += deltaTime;
 		if (attackTimer > ATTACK_DELAY) {

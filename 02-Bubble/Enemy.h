@@ -15,11 +15,11 @@ public:
 private:
 	float attackTimer = 0;
 	Sprite* spr;
-	glm::ivec2 vel = glm::ivec2(0);
+	glm::fvec2 vel = glm::fvec2(0);
 	Entity* player = nullptr;
 	enum State;
 	State currentState;
-	glm::ivec2 CalculateDir();
+	glm::fvec2 CalculateDir();
 	void Attack();
 };
 

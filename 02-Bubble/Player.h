@@ -13,18 +13,21 @@ class Player : public Entity
 
 public:
 	Player();
-	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
 	void setTileMap(TileMap *tileMap);
 	void Attack(float damage);
+	void ManageAnims(int deltaTime);
 private:
 	float jumpMax;
 	float jumpTime = 0;
+	float jumpAttackTimer = 0;
+	float slowAttackTimer = 0;
 	Sprite* sprite;
 	bool bJumping;
 	enum Dir;
-	glm::ivec2 tileMapDispl, inp, vel, friction;
+	glm::fvec2 tileMapDispl, inp, vel, friction;
 	int jumpAngle, startY;
 	Texture spritesheet;
 	TileMap *map;

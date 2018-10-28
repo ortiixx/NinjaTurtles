@@ -11,10 +11,10 @@ public:
 	};
 	Layer l = Character;
 	Collider();
-	Collider(glm::ivec2 bounds);
-	glm::ivec2 GetBounds() { return this->bounds; }
+	Collider(glm::fvec2 bounds);
+	glm::fvec2 GetBounds() { return this->bounds; }
 	~Collider();
 private:
-	glm::ivec2 bounds;
+	glm::fvec2 bounds;
 };
 

@@ -72,17 +72,19 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
-	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->init(glm::fvec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setTileMap(map);
 	Block* bl = new Block(texProgram);
-	bl->transform.SetPosition(player->transform.GetPosition()+glm::ivec2(80,0));
-	Enemy* en = new Enemy(texProgram);
-	en->transform.SetPosition(player->transform.GetPosition() + glm::ivec2(160, 0));
+	bl->transform.SetPosition(player->transform.GetPosition()+glm::fvec2(80,0));
 
 	//Adding Entities
 	AddEntity(player); //Player always the first entity
 	AddEntity(bl);
-	AddEntity(en);
+	for (int i = 0; i < 10; i++) {
+		Enemy* en = new Enemy(texProgram);
+		en->transform.SetPosition(player->transform.GetPosition() + glm::fvec2(160+i*100, +i*10));
+		AddEntity(en);
+	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	UpdateSceneColliders();

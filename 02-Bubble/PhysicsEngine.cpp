@@ -26,12 +26,12 @@ void PhysicsEngine::AddSceneCollider(Collider* c)
 	sceneColliders.push_back(c);
 }
 
-std::vector<Collider*> PhysicsEngine::CastCollision(glm::ivec2 pos, glm::ivec2 bounds, const std::vector<Collider *> &ignore)
+std::vector<Collider*> PhysicsEngine::CastCollision(glm::fvec2 pos, glm::fvec2 bounds, const std::vector<Collider *> &ignore)
 {
 	std::vector<Collider*> output;
 	Collider* c1 = new Collider(bounds);
 	c1->l = Collider::Cast;
-	c1->transform = new Transform(pos, glm::ivec2(1, 1));
+	c1->transform = new Transform(pos, glm::fvec2(1, 1));
 	for (int i = 0; i < sceneColliders.size(); i++) {
 		Collider* c2 = sceneColliders[i];
 		bool b = false;

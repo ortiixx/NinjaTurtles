@@ -13,7 +13,7 @@ public:
 	Entity();
 	~Entity();
 	EntityComponent* GetComponent(std::string name);
-	glm::ivec2 GetPosition() { return transform.GetPosition(); }
+	glm::fvec2 GetPosition() { return transform.GetPosition(); }
 	void AddComponent(EntityComponent* comp);
 	virtual void update(int deltaTime);
 	virtual void render();
@@ -23,7 +23,7 @@ public:
 protected:
 	std::vector <EntityComponent*> components;
 	bool alive = true;
-	glm::ivec2 position;
-	glm::ivec2 scale;
+	glm::fvec2 position;
+	glm::fvec2 scale;
 	int id; 
 };

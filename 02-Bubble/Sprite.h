@@ -47,7 +47,7 @@ private:
 	int currentFrame;
 	int dieAnim = -10;
 	vector<Anim> animations;
-	glm::ivec2 position, scale;
+	glm::fvec2 position, scale;
 	bool playingOnce = false;
 };
 
