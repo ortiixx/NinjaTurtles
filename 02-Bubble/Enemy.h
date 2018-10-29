@@ -11,6 +11,7 @@ public:
 	Enemy(ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	Texture tex;
+	void setObjective(Entity* e) { player = e; }
 	~Enemy();
 private:
 	float attackTimer = 0;

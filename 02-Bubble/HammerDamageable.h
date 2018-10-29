@@ -1,16 +1,12 @@
-#include "EntityComponent.h"
 #pragma once
-class Damageable : public EntityComponent
+#include "Damageable.h"
+class HammerDamageable :
+	public Damageable
 {
 public:
-	Damageable();
-	Damageable(float health);
-	~Damageable();
-
+	HammerDamageable(float ammount);
+	~HammerDamageable();
 	virtual void AddDamage(float ammount, glm::fvec2 fDir, int sender); //Adds damage and pushes entity to fDir
 	virtual void Die();
-protected:
-	float health;
-
 };
 

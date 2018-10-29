@@ -2,7 +2,7 @@
 #include "Block.h"
 #include "Sprite.h"
 #include "Collider.h"
-#include "Damageable.h"
+#include "HammerDamageable.h"
 #include "Scene.h"
 
 #define ATTACK_DELAY 600
@@ -27,7 +27,7 @@ Enemy::Enemy(ShaderProgram &shaderProgram)
 	tex.loadFromFile("images/Characters/Ninja_pink.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spr = new Sprite(glm::fvec2(128, 128), glm::dvec2(1.f / 5.f, 1.f / 3.f), 5, 3, &tex, &shaderProgram);
 	AddComponent(new Collider(glm::fvec2(128/2, 128/2)));
-	AddComponent(new Damageable(300));
+	AddComponent(new HammerDamageable(300));
 	AddComponent(spr);
 	spr->setAnimation(WALK, 0, 5,9, false);
 	spr->setAnimation(ATTACK, 5, 5, 5, true);
@@ -59,7 +59,7 @@ void Enemy::Attack() {
 		Damageable* dmg = (Damageable*)e->GetComponent("Damageable");
 		glm::fvec2 dir = glm::fvec2(0, 0);
 		if (dmg != nullptr)
-			dmg->AddDamage(DAMAGE, dir);
+			dmg->AddDamage(DAMAGE, dir, id);
 	}
 }
 

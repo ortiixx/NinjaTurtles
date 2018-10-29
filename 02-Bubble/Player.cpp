@@ -101,7 +101,7 @@ void Player::Attack(float damage) {
 		Damageable* dmg = (Damageable*)e->GetComponent("Damageable");
 		glm::fvec2 dir = glm::fvec2(FORCE, 0) * transform.GetScale().x;
 		if (dmg != nullptr)
-			dmg->AddDamage(damage, dir);
+			dmg->AddDamage(damage, dir, id);
 	}
 }
 

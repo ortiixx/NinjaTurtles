@@ -80,7 +80,7 @@ void Scene::init()
 	//Adding Entities
 	AddEntity(player); //Player always the first entity
 	AddEntity(bl);
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 2; i++) {
 		Enemy* en = new Enemy(texProgram);
 		en->transform.SetPosition(player->transform.GetPosition() + glm::fvec2(160+i*100, +i*10));
 		AddEntity(en);

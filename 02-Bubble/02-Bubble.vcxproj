@@ -18,6 +18,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponent.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="HammerDamageable.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityComponent.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HammerDamageable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Player.cpp" />
