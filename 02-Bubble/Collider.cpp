@@ -4,7 +4,7 @@ Collider::Collider()
 {
 }
 
-Collider::Collider(glm::ivec2 bounds)
+Collider::Collider(glm::fvec2 bounds)
 {
 	name = "Collider";
 	this->bounds = bounds;

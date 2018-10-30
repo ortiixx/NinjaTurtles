@@ -5,6 +5,8 @@
 #include "Game.h"
 #include "Block.h"
 #include "Enemy.h"
+#include "Enemy2.h"
+#include "Enemy3.h"
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -41,10 +43,9 @@ void Scene::RemoveEntity(int id)
 	if (!entities.count(id)) return;
 	Entity* ent = entities[id];
 	Collider* c = (Collider*)ent->GetComponent("Collider");
-	if (c != nullptr) {
-		//PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
+	if (c != nullptr) 
 		ps->RemoveSceneCollider(c);
-	}
+
 	entities.erase(id);
 	
 }
@@ -72,17 +73,27 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
-	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->init(glm::fvec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setTileMap(map);
 	Block* bl = new Block(texProgram);
-	bl->transform.SetPosition(player->transform.GetPosition()+glm::ivec2(80,0));
-	Enemy* en = new Enemy(texProgram);
-	en->transform.SetPosition(player->transform.GetPosition() + glm::ivec2(160, 0));
+	bl->transform.SetPosition(player->transform.GetPosition() - glm::fvec2(80, 40));
+	player->transform.SetPosition(player->transform.GetPosition()*glm::fvec2(0, +10));
 
 	//Adding Entities
 	AddEntity(player); //Player always the first entity
 	AddEntity(bl);
-	AddEntity(en);
+	for (int i = 0; i < 10; i++) {
+		if (i % 2 == 0) {
+			Enemy3* en = new Enemy3(texProgram);
+			en->transform.SetPosition(player->transform.GetPosition() + glm::fvec2(160 + i * 100, +i * 40));
+			AddEntity(en);
+		}
+		else if(i>100){
+			Enemy* en = new Enemy(texProgram);
+			en->transform.SetPosition(player->transform.GetPosition() + glm::fvec2(160 + i * 100, +i * 40));
+			AddEntity(en);
+		}
+	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	UpdateSceneColliders();

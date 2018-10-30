@@ -84,9 +84,9 @@ bool TileMap::loadLevel(const string &levelFile)
 		{
 			fin.get(tile);
 			if(tile == ' ')
-				map[j*mapSize.x+i] = 0;
+				map[(int)(j*mapSize.x+i)] = 0;
 			else
-				map[j*mapSize.x+i] = tile - int('0');
+				map[int(j*mapSize.x+i)] = tile - int('0');
 		}
 		fin.get(tile);
 #ifndef _WIN32
@@ -109,7 +109,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 	{
 		for(int i=0; i<mapSize.x; i++)
 		{
-			tile = map[j * mapSize.x + i];
+			tile = map[int(j * mapSize.x + i)];
 			if(tile != 0)
 			{
 				// Non-empty tile
@@ -150,7 +150,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveLeft(const glm::fvec2 &pos, const glm::fvec2 &size) const
 {
 	int x, y0, y1;
 	
@@ -159,14 +159,14 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if(map[int(y*mapSize.x+x)] != 0)
 			return true;
 	}
 	
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveRight(const glm::fvec2 &pos, const glm::fvec2 &size) const
 {
 	int x, y0, y1;
 	
@@ -175,14 +175,14 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if(map[int(y*mapSize.x+x)] != 0)
 			return true;
 	}
 	
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+bool TileMap::collisionMoveDown(const glm::fvec2 &pos, const glm::fvec2 &size, int *posY) const
 {
 	int x0, x1, y;
 	
@@ -191,7 +191,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if(map[int(y*mapSize.x+x)] != 0)
 		{
 			if(*posY - tileSize * y + size.y <= 4)
 			{

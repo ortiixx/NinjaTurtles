@@ -55,7 +55,8 @@ void Sprite::update(int deltaTime)
 			animations[currentAnimation].keyframes
 			)
 		{
-			if (playingOnce && dieAnim == currentAnimation) return;
+			if (dieAnim == currentAnimation && currentFrame >= animations[currentAnimation].startframe +
+				animations[currentAnimation].keyframes) return;
 			if (playingOnce) currentAnimation = 0;
 			if (animations[currentAnimation].once) playingOnce = true;
 			currentFrame = animations[currentAnimation].startframe;
@@ -73,9 +74,10 @@ void Sprite::update(int deltaTime)
 
 void Sprite::render() const
 {
+	if (!active) return;
 	transform->SetLastPosition(transform->GetPosition());
-	glm::ivec2 scale = transform->GetScale();
-	glm::ivec2 position = transform->GetPosition();
+	glm::fvec2 scale = transform->GetScale();
+	glm::fvec2 position = transform->GetPosition();
 	glm::mat4 modelview = glm::translate(glm::mat4(1), glm::vec3(position.x, position.y, layer));
 	modelview = glm::translate(modelview, glm::vec3(quadSize.x / 2.f, quadSize.y / 2.f, 0.f));
 	modelview = glm::scale(modelview, glm::vec3(scale.x, scale.y, 1.f));
@@ -117,13 +119,13 @@ void Sprite::setAnimation(int animId, int sKey, int length, int keyframesPerSec,
 void Sprite::changeAnimation(int animId)
 {
 	if (animId != dieAnim && (currentAnimation >= 0 && animations[currentAnimation].once && !animations[animId].once)) return;
-		currentAnimation = animId;
-		playingOnce = false;
+	currentAnimation = animId;
+	playingOnce = false;
 }
 
 void Sprite::Die()
 {
-	currentAnimation = dieAnim;
+	changeAnimation(dieAnim);
 	Collider* c = (Collider*)Scene::GetEntity(entityId)->GetComponent("Collider");
 	if (c != nullptr)
 		c->setActive(false);

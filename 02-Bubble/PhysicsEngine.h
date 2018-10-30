@@ -16,7 +16,7 @@ public:
 			instance = new PhysicsEngine();
 		return instance;
 	}
-	std::vector<Collider * > CastCollision(glm::ivec2 pos, glm::ivec2 bounds, const std::vector<Collider *> &ignore);
+	std::vector<Collider * > CastCollision(glm::fvec2 pos, glm::fvec2 bounds, const std::vector<Collider *> &ignore);
 
 private:
 	std::vector<Collider * > sceneColliders;
