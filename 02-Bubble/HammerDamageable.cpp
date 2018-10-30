@@ -16,7 +16,7 @@ void HammerDamageable::AddDamage(float ammount, glm::fvec2 fDir, int sender)
 {
 	Damageable::AddDamage(ammount, fDir, sender);
 	Enemy* e = (Enemy*)(Scene::GetEntity(entityId));
-	e->setObjective(Scene::GetEntity(sender));
+	if(health>0) e->GetDamage();
 }
 
 void HammerDamageable::Die()

@@ -20,7 +20,7 @@
 #define ATTACK_TIMER 600
 #define JUMP_HEIGHT 500
 #define ROLL_BOOST 100
-#define JUMP_ATTACK_DELAY 400
+#define JUMP_ATTACK_DELAY 100
 #define SLOW_ATTACK_DELAY 400
 
 
@@ -35,6 +35,7 @@ C- JUMP
 V- ROLL
 */
 
+PhysicsEngine* ps;
 
 enum PlayerAnims
 {
@@ -61,20 +62,21 @@ enum Player::Dir
 
 void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
+	ps = PhysicsEngine::PhysicsGetInstance();
 	bJumping = false;
 	lookDir = LOOKING_RIGHT;
 	spritesheet.loadFromFile("images/Characters/donatello.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	transform.SetPosition(glm::vec2(69, 69));
 	AddComponent(new Sprite (glm::fvec2(128, 128), glm::dvec2(1.f/9.f, 1.f/14.f), 9, 21, &spritesheet, &shaderProgram));
 	AddComponent(new Collider(glm::fvec2(128/4, 128/3)));
-	AddComponent(new Damageable(0));
+	AddComponent(new Damageable(100));
 	sprite = (Sprite*)GetComponent("Sprite");
-	sprite->setAnimation(IDLE, 0, 5, 9, false);
+	sprite->setAnimation(IDLE, 0, 5, 6, false);
 	sprite->setAnimation(WALK1, 59, 8, 9, false);
 	sprite->setAnimation(WALK2, 67, 8, 9, false);
 	sprite->setAnimation(ATTACK1, 17, 4, 9, true);
 	sprite->setAnimation(ATTACK2, 20, 7, 9, true);
-	sprite->setAnimation(JUMP_ATTACK2, 52, 7, 9, true);
+	sprite->setAnimation(JUMP_ATTACK2, 52, 7, 18, true);
 	sprite->setAnimation(JUMP_ATTACK1, 46, 3, 9, true);
 	sprite->setAnimation(ROLL, 36, 10, 12, true);
 	sprite->setAnimation(ROLL2, 36, 10, 12, true);
@@ -88,8 +90,6 @@ void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram)
 }
 
 void Player::Attack(float damage) {
-
-	PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
 	glm::fvec2 pos = transform.GetPosition() + glm::fvec2(ATTACK_RANGE, 0) * transform.GetScale().x;
 	glm::fvec2 bounds = glm::fvec2(128 / 3);
 	std::vector<Collider*> ign;
@@ -107,8 +107,11 @@ void Player::Attack(float damage) {
 
 
 void Player::ManageAnims(int deltaTime) {
-	if (sprite->animation() == ROLL2) vel.x += ROLL_BOOST * transform.GetScale().x;
-	else if (sprite->animation() == JUMP_ATTACK1) {
+	if (sprite->animation() == ROLL2) {
+		vel.x += ROLL_BOOST * transform.GetScale().x;
+		((Collider*)GetComponent("Collider"))->setActive(false);
+	}
+	else if (sprite->animation() == JUMP_ATTACK1 || sprite->animation() == JUMP_ATTACK2) {
 		if (jumpAttackTimer > JUMP_ATTACK_DELAY) {
 			Attack(SLOW_DAMAGE_AMMOUNT * 2);
 			jumpAttackTimer = 0;
@@ -125,9 +128,23 @@ void Player::ManageAnims(int deltaTime) {
 	}
 	else { //Reset all timers here
 		jumpAttackTimer = 0;
+		slowAttackTimer = 0;
+		((Collider*)GetComponent("Collider"))->setActive(true);
 	}
 }
 
+
+float lastY = 0;
+
+bool Player::CheckUp(float t) {
+	Collider* c = (Collider*)GetComponent("Collider");
+	std::vector<Collider*> ign;
+	ign.push_back(c);
+	std::vector<Collider*> cols = ps->CastCollision(glm::fvec2(transform.GetPosition().x, lastY-t), c->GetBounds(), ign);
+	for (int i = 0; i < cols.size(); i++)
+		if (cols[i]->l == Collider::Level) return true;
+	return false;
+}
 
 void Player::update(int deltaTime)
 {
@@ -139,12 +156,15 @@ void Player::update(int deltaTime)
 	jumpMax = 2 * pi;
 	if (bJumping) {
 		jumpTime += 9*(float)deltaTime/1000.f;
+		GetComponent("Collider")->setActive(false);
 		vel.y -= sin(jumpTime) * JUMP_HEIGHT;
 		if (jumpTime > jumpMax) {
 			vel.y -= sin(jumpMax) * JUMP_HEIGHT;
 			bJumping = false;
+			GetComponent("Collider")->setActive(true);
 		}
 	}
+
 	glm::fvec2 inp = glm::fvec2(0, 0);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
@@ -156,12 +176,13 @@ void Player::update(int deltaTime)
 		inp.x += INPUT_SENSITIVITY;
 		lookDir = LOOKING_RIGHT;
 	}
-	if (Game::instance().getSpecialKey(GLUT_KEY_DOWN))
+	if (!rolling && Game::instance().getSpecialKey(GLUT_KEY_DOWN))
 	{
 		inp.y += INPUT_SENSITIVITY;
 	}
-	if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+	if ((!bJumping || !CheckUp(lastY + inp.y * (float)deltaTime / 1000.f)) && Game::instance().getSpecialKey(GLUT_KEY_UP) && !rolling) {
 		inp.y -= INPUT_SENSITIVITY;
+		lastY += inp.y * (float)deltaTime / 1000.f;
 	}
 	if (Game::instance().getSpecialKey(GLUT_ACTIVE_CTRL)) {
 		inp.y -= INPUT_SENSITIVITY;
@@ -169,12 +190,15 @@ void Player::update(int deltaTime)
 	if (!rolling && !bJumping && Game::instance().getKey('c')) {
 		sprite->changeAnimation(ROLL);
 		bJumping = true;
+		lastY = transform.GetPosition().y;
 		jumpTime = 0;
 	}
 	if (!rolling && !attacking && Game::instance().getKey('z')) {
 		if (bJumping) { sprite->changeAnimation(JUMP_ATTACK1);}
-		else sprite->changeAnimation(ATTACK1);
-		Attack(FAST_DAMAGE_AMMOUNT);
+		else {
+			sprite->changeAnimation(ATTACK1);
+			Attack(FAST_DAMAGE_AMMOUNT);
+		}
 	}
 	if (!rolling && !attacking && Game::instance().getKey('x')) {
 		if (bJumping) sprite->changeAnimation(JUMP_ATTACK2);

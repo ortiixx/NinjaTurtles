@@ -5,17 +5,18 @@
 #include "Sprite.h"
 #include <glm/glm.hpp>
 
-class Enemy : public Entity
+class Enemy2 : public Entity
 {
 public:
-	Enemy(ShaderProgram &shaderProgram);
+	Enemy2(ShaderProgram &shaderProgram);
 	virtual void update(int deltaTime);
 	Texture tex;
 	void setObjective(Entity* e) { player = e; }
 	virtual void GetDamage();
-	~Enemy();
+	~Enemy2();
 protected:
 	float attackTimer = 0;
+	float recoveryTimer = 0;
 	Sprite* spr;
 	glm::fvec2 vel = glm::fvec2(0);
 	Entity* player = nullptr;

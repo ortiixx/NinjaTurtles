@@ -28,6 +28,7 @@ private:
 	bool bJumping;
 	enum Dir;
 	glm::fvec2 tileMapDispl, inp, vel, friction;
+	bool CheckUp(float t);
 	int jumpAngle, startY;
 	Texture spritesheet;
 	TileMap *map;

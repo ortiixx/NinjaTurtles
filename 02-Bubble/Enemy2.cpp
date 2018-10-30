@@ -1,15 +1,18 @@
-#include "Enemy.h"
+#include "Enemy2.h"
 #include "Block.h"
 #include "Sprite.h"
 #include "Collider.h"
 #include "HammerDamageable.h"
 #include "Scene.h"
 
-#define ATTACK_DELAY 500
+#define ATTACK_DELAY 100
 #define ATTACK_RANGE 30
-#define ATTACK_DIST 30
-#define DAMAGE 30
-#define SPEED 80
+#define ATTACK_DIST 160
+#define DAMAGE 15
+#define SPEED 130
+#define IMPULSE 2
+#define RECOVERYTIME 1500
+#define HEALTH 100
 enum Animations {
 	WALK,
 	ATTACK,
@@ -17,39 +20,40 @@ enum Animations {
 	HURT
 };
 
-enum Enemy::State{
+enum Enemy2::State {
 	CHASE,
 	ATTACK,
 	EVADE,
 };
 
-Enemy::Enemy(ShaderProgram &shaderProgram)
+Enemy2::Enemy2(ShaderProgram &shaderProgram)
 {
 	currentState = CHASE;
-	tex.loadFromFile("images/Characters/Ninja_pink.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	tex.loadFromFile("images/Characters/Ninja_purple.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spr = new Sprite(glm::fvec2(128, 128), glm::dvec2(1.f / 5.f, 1.f / 3.f), 5, 4, &tex, &shaderProgram);
-	AddComponent(new Collider(glm::fvec2(128/2, 128/2)));
-	AddComponent(new HammerDamageable(300));
+	AddComponent(new Collider(glm::fvec2(128 / 2, 128 / 2)));
+	AddComponent(new HammerDamageable(HEALTH));
 	AddComponent(spr);
-	spr->setAnimation(WALK, 0, 5,13, false);
+	spr->setAnimation(WALK, 0, 5, 9, false);
 	spr->setAnimation(ATTACK, 5, 5, 7, true);
 	spr->setAnimation(DIE, 10, 5, 7, true);
-	spr->setAnimation(HURT, 10, 2, 7, true);
+	spr->setAnimation(HURT, 10, 3, 7, true);
 	spr->changeAnimation(WALK);
 	spr->setDieAnim(DIE);
 }
 
-glm::fvec2 Enemy::CalculateDir() {
+glm::fvec2 Enemy2::CalculateDir() {
 	glm::fvec2 tpos = transform.GetPosition();
 	glm::fvec2 ppos = player->transform.GetPosition();
 	int x, y;
-	if (tpos.x - ppos.x > 0) x = -1; else x = 1;
-	if (tpos.y - ppos.y > 0) y = -1; else y = 1;
+	float margin = 1;
+	if (tpos.x - ppos.x > margin) x = -1; else if (tpos.x - ppos.x < -margin) x = 1; else x = 0;
+	if (tpos.y - ppos.y > margin)y = -1; else if (tpos.y - ppos.y < -margin) y = 1; else y = 0;
 	return glm::fvec2(x, y);
 }
 
 
-void Enemy::Attack() {
+void Enemy2::Attack() {
 	PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
 	glm::fvec2 pos = transform.GetPosition() + CalculateDir();
 	glm::fvec2 bounds = glm::fvec2(128 / 3);
@@ -66,12 +70,20 @@ void Enemy::Attack() {
 	}
 }
 
-void Enemy::update(int deltaTime) {
+void Enemy2::update(int deltaTime) {
 	Entity::update(deltaTime);
-	if (!alive) return;
 	if (player == nullptr) player = Scene::GetEntity(0); //Player always the first entity
+	if (!alive) return;
+	glm::fvec2 dir = CalculateDir();
+	glm::fvec2 scale = transform.GetScale();
+	if (spr->animation() == ATTACK) {
+		dir.x -= scale.x * IMPULSE;
+		dir.y = 0;
+	}
+	else if(dir.x != 0)
+		scale.x = -dir.x;
 
-	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST) {
+	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST && recoveryTimer <= 0) {
 		currentState = ATTACK;
 	}
 	else if (spr->animation() != ATTACK) {
@@ -81,24 +93,22 @@ void Enemy::update(int deltaTime) {
 	if (spr->animation() == ATTACK) {
 		attackTimer += deltaTime;
 		if (attackTimer > ATTACK_DELAY) {
+			recoveryTimer = RECOVERYTIME;
 			attackTimer = 0;
 			Attack();
 		}
 	}
-	glm::fvec2 dir = CalculateDir();
-	glm::fvec2 scale = transform.GetScale();
-	scale.x = -dir.x;
 	transform.SetScale(scale);
-	if(currentState == CHASE)
-		transform.SetPosition(transform.GetPosition() + dir * float(SPEED) * float(deltaTime) / 1000.f);
+	transform.SetPosition(transform.GetPosition() + dir * glm::fvec2(SPEED,SPEED/3) * float(deltaTime)/1000.f);
 	if (currentState == ATTACK && spr->animation() != ATTACK)
 		spr->changeAnimation(ATTACK);
+	recoveryTimer -= deltaTime;
 }
 
-void Enemy::GetDamage() {
+void Enemy2::GetDamage() {
 	spr->changeAnimation(HURT);
 }
 
-Enemy::~Enemy()
+Enemy2::~Enemy2()
 {
 }

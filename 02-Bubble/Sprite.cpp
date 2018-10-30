@@ -74,6 +74,7 @@ void Sprite::update(int deltaTime)
 
 void Sprite::render() const
 {
+	if (!active) return;
 	transform->SetLastPosition(transform->GetPosition());
 	glm::fvec2 scale = transform->GetScale();
 	glm::fvec2 position = transform->GetPosition();
