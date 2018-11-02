@@ -26,7 +26,7 @@ public:
 	int animation() const;
 	float layer = 0;
 	bool customZ;
-
+	void setCoord(glm::fvec2 c) { texCoordDispl = c; }
 private:
 	struct Anim {
 		float speed;

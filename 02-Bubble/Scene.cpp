@@ -98,6 +98,9 @@ void Scene::AddEntity(Entity * ent)
 
 void Scene::Clean() {
 	entities = std::map<int, Entity*>();
+	ps->Clean();
+	moveC = true;
+	inCombat = false;
 }
 
 void Scene::init()
@@ -215,7 +218,8 @@ void Scene::update(int deltaTime)
 			Clean();
 			Level_2* level2 = new Level_2(texProgram);
 			player = new Player();
-			player->init(glm::fvec2(SCREEN_X, SCREEN_Y), texProgram,players[selected]);
+			PhysicsEngine::Clean();
+			player->init(glm::fvec2(SCREEN_X, SCREEN_Y+100), texProgram,players[selected]);
 			AddEntity(level2);
 			AddEntity(player);
 			intro_level_2 = false;
@@ -250,10 +254,6 @@ void Scene::update(int deltaTime)
 	if (encount == 0) {
 		moveC = true;
 		inCombat = false;
-	}
-	if (player != nullptr && player->transform.GetPosition().x > SCREEN_X + 1500 && !inCombat) {
-		intro_level_2 = true;
-		Clean();
 	}
 }
 

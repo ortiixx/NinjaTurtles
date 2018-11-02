@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
 
 PhysicsEngine* PhysicsEngine::instance = nullptr;
-
+std::vector<Collider*> PhysicsEngine::sceneColliders;
 
 PhysicsEngine::PhysicsEngine()
 {

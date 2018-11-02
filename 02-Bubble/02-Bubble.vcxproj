@@ -32,6 +32,7 @@
     <ClInclude Include="PlayerDamageable.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Scroller.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Sprite.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="PlayerDamageable.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Scroller.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Sprite.cpp" />

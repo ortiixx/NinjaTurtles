@@ -19,7 +19,7 @@
 #define FORCE 20
 #define ATTACK_TIMER 600
 #define JUMP_HEIGHT 500
-#define ROLL_BOOST 100
+#define ROLL_BOOST 200
 #define JUMP_ATTACK_DELAY 100
 #define SLOW_ATTACK_DELAY 300
 #define MAXJUMPCOUNTER 1200
@@ -79,7 +79,7 @@ void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram, st
 	sprite->setAnimation(ATTACK2, 20, 5, 12, true);
 	sprite->setAnimation(JUMP_ATTACK2, 45, 5, 18, true);
 	sprite->setAnimation(JUMP_ATTACK1, 45, 5, 18, true);
-	sprite->setAnimation(ROLL, 25, 5, 12, true);
+	sprite->setAnimation(ROLL, 25, 5, 8, true);
 	sprite->setAnimation(ROLL2, 25, 5, 12, true);
 	sprite->setAnimation(HIT1, 30, 5, 9, true);
 	sprite->setAnimation(HITHARD, 112, 5, 9, true);

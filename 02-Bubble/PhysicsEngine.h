@@ -11,6 +11,7 @@ public:
 	void AddSceneCollider(Collider* c);
 	void RemoveSceneCollider(Collider* c);
 	void physicsLoop();
+	static void Clean() { sceneColliders = std::vector<Collider*>(); }
 	static PhysicsEngine* PhysicsGetInstance() {
 		if (instance == nullptr) 
 			instance = new PhysicsEngine();
@@ -19,7 +20,7 @@ public:
 	std::vector<Collider * > CastCollision(glm::fvec2 pos, glm::fvec2 bounds, const std::vector<Collider *> &ignore);
 
 private:
-	std::vector<Collider * > sceneColliders;
+	static std::vector<Collider * > sceneColliders;
 	std::vector<Collider * > movedColliders;
 	void solveConflict(Collider* c1, Collider* c2);
 	bool checkConflict(Collider* c1, Collider* c2);
