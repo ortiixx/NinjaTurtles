@@ -27,6 +27,7 @@ bool Scene::moveC = true;
 Player* Scene::player = nullptr;
 int Scene::encount = 0;
 bool Scene::inCombat = false;
+
 std::vector<string> players{
 	"images/Characters/Donatello_gamma.png",
 	"images/Characters/Michelangelo_gamma.png",
@@ -56,8 +57,9 @@ PhysicsEngine* Scene::ps = PhysicsEngine::PhysicsGetInstance();
 
 void Scene::RemoveEntity(int id)
 {
+	if (entities.count(id) == 0 ) return;
 	Entity* ent = entities[id];
-	/ollider* c = (Collider*)ent->GetComponent("Collider");
+	Collider* c = (Collider*)ent->GetComponent("Collider");
 	((Sprite*)ent->GetComponent("Sprite"))->setActive(false);
 	if (c != nullptr) {
 		//PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
@@ -95,9 +97,7 @@ void Scene::AddEntity(Entity * ent)
 }
 
 void Scene::Clean() {
-	for (auto const& x : entities) {
-		RemoveEntity(x.second->getId());
-	}
+	entities = std::map<int, Entity*>();
 }
 
 void Scene::init()
@@ -198,11 +198,11 @@ void Scene::update(int deltaTime)
 			intro_level_1 = false;
 			level_1 = true;
 			loadlevel1();
-			init();
 		}
 	}
 	if (level_1){
 		if (Game::instance().getKey('q')){ //When Rocksteady Die
+			Clean();
 			Text* intro = new Text(texProgram, 2);
 			AddEntity(intro);
 			level_1 = false;
@@ -212,6 +212,7 @@ void Scene::update(int deltaTime)
 	if (intro_level_2){
 		if (Game::instance().getKey(' ')){
 			//PlaySound(NULL, 0, 0);
+			Clean();
 			Level_2* level2 = new Level_2(texProgram);
 			player = new Player();
 			player->init(glm::fvec2(SCREEN_X, SCREEN_Y), texProgram,players[selected]);
@@ -326,7 +327,7 @@ void Scene::loadlevel1()
 	AddEntity(c3);
 	CombatZone* c4 = new CombatZone(p.x + 800, 0, 1, 2, 0, 0, player, texProgram);
 	AddEntity(c4);
-	CombatZone* c5 = new CombatZone(p.x + 1500, 0, 0, 0, 1, 0, player, texProgram);
+	CombatZone* c5 = new CombatZone(p.x + 1400, 0, 0, 0, 1, 0, player, texProgram);
 	AddEntity(c5);
 }
 
