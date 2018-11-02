@@ -20,7 +20,19 @@ protected:
 	Sprite* spr;
 	glm::fvec2 vel = glm::fvec2(0);
 	Entity* player = nullptr;
-	enum State;
+	enum Animations {
+		WALK,
+		ATTACK,
+		DIE,
+		HURT
+	};
+
+	enum State {
+		CHASE,
+		ATTACKING,
+		EVADE,
+	};
+
 	State currentState;
 	glm::fvec2 CalculateDir();
 	virtual void Attack();

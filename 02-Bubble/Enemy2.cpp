@@ -13,18 +13,6 @@
 #define IMPULSE 2
 #define RECOVERYTIME 1500
 #define HEALTH 100
-enum Animations {
-	WALK,
-	ATTACK,
-	DIE,
-	HURT
-};
-
-enum Enemy2::State {
-	CHASE,
-	ATTACK,
-	EVADE,
-};
 
 Enemy2::Enemy2(ShaderProgram &shaderProgram)
 {
@@ -72,7 +60,7 @@ void Enemy2::Attack() {
 
 void Enemy2::update(int deltaTime) {
 	Entity::update(deltaTime);
-	if (player == nullptr) player = Scene::GetEntity(0); //Player always the first entity
+	if (player == nullptr) player = Scene::GetPlayer(); //Player always the first entity
 	if (!alive) return;
 	glm::fvec2 dir = CalculateDir();
 	glm::fvec2 scale = transform.GetScale();
@@ -84,7 +72,7 @@ void Enemy2::update(int deltaTime) {
 		scale.x = -dir.x;
 
 	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST && recoveryTimer <= 0) {
-		currentState = ATTACK;
+		currentState = ATTACKING;
 	}
 	else if (spr->animation() != ATTACK) {
 		currentState = CHASE;
@@ -100,7 +88,7 @@ void Enemy2::update(int deltaTime) {
 	}
 	transform.SetScale(scale);
 	transform.SetPosition(transform.GetPosition() + dir * glm::fvec2(SPEED,SPEED/3) * float(deltaTime)/1000.f);
-	if (currentState == ATTACK && spr->animation() != ATTACK)
+	if (currentState == ATTACKING && spr->animation() != ATTACK)
 		spr->changeAnimation(ATTACK);
 	recoveryTimer -= deltaTime;
 }

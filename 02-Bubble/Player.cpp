@@ -7,22 +7,23 @@
 #include "Collider.h"
 #include "PhysicsEngine.h"
 #include "Scene.h"
-#include "Damageable.h"
+#include "PlayerDamageable.h"
 
 #define JUMP_ANGLE_STEP 4
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
 #define INPUT_SENSITIVITY 80
 #define ATTACK_RANGE 20
-#define FAST_DAMAGE_AMMOUNT 5
-#define SLOW_DAMAGE_AMMOUNT 20
+#define FAST_DAMAGE_AMMOUNT 20
+#define SLOW_DAMAGE_AMMOUNT 70
 #define FORCE 20
 #define ATTACK_TIMER 600
 #define JUMP_HEIGHT 500
 #define ROLL_BOOST 100
 #define JUMP_ATTACK_DELAY 100
-#define SLOW_ATTACK_DELAY 400
-
+#define SLOW_ATTACK_DELAY 300
+#define MAXJUMPCOUNTER 1200
+#define HEALTH 100
 
 const double pi = 3.14159265358979323846;
 
@@ -60,33 +61,34 @@ enum Player::Dir
 	LOOKING_LEFT, LOOKING_RIGHT
 };
 
-void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram)
+void Player::init(const glm::fvec2 &tileMapPos, ShaderProgram &shaderProgram, string sheet)
 {
 	ps = PhysicsEngine::PhysicsGetInstance();
 	bJumping = false;
 	lookDir = LOOKING_RIGHT;
-	spritesheet.loadFromFile("images/Characters/donatello.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet.loadFromFile(sheet, TEXTURE_PIXEL_FORMAT_RGBA);
 	transform.SetPosition(glm::vec2(69, 69));
-	AddComponent(new Sprite (glm::fvec2(128, 128), glm::dvec2(1.f/9.f, 1.f/14.f), 9, 21, &spritesheet, &shaderProgram));
+	AddComponent(new Sprite (glm::fvec2(128, 128), glm::dvec2(1.f/5.f, 1.f/10.f), 5, 21, &spritesheet, &shaderProgram));
 	AddComponent(new Collider(glm::fvec2(128/4, 128/3)));
-	AddComponent(new Damageable(100));
+	AddComponent(new PlayerDamageable(HEALTH));
 	sprite = (Sprite*)GetComponent("Sprite");
 	sprite->setAnimation(IDLE, 0, 5, 6, false);
-	sprite->setAnimation(WALK1, 59, 8, 9, false);
-	sprite->setAnimation(WALK2, 67, 8, 9, false);
-	sprite->setAnimation(ATTACK1, 17, 4, 9, true);
-	sprite->setAnimation(ATTACK2, 20, 7, 9, true);
-	sprite->setAnimation(JUMP_ATTACK2, 52, 7, 18, true);
-	sprite->setAnimation(JUMP_ATTACK1, 46, 3, 9, true);
-	sprite->setAnimation(ROLL, 36, 10, 12, true);
-	sprite->setAnimation(ROLL2, 36, 10, 12, true);
-	sprite->setAnimation(HIT1, 36, 10, 3, true);
-	sprite->setAnimation(HITHARD, 112, 10, 9, true);
-	sprite->setAnimation(DIE, 85, 6, 9, true);
+	sprite->setAnimation(WALK1, 5, 5, 9, false);
+	sprite->setAnimation(WALK2, 5, 5, 9, false);
+	sprite->setAnimation(ATTACK1, 15, 5, 9, true);
+	sprite->setAnimation(ATTACK2, 20, 5, 12, true);
+	sprite->setAnimation(JUMP_ATTACK2, 45, 5, 18, true);
+	sprite->setAnimation(JUMP_ATTACK1, 45, 5, 18, true);
+	sprite->setAnimation(ROLL, 25, 5, 12, true);
+	sprite->setAnimation(ROLL2, 25, 5, 12, true);
+	sprite->setAnimation(HIT1, 30, 5, 9, true);
+	sprite->setAnimation(HITHARD, 112, 5, 9, true);
+	sprite->setAnimation(DIE, 40, 5, 9, true);
 	sprite->setDieAnim(DIE);
 	tileMapDispl = tileMapPos;
 	friction = glm::vec2(2,3);
 	transform.SetPosition(glm::vec2(float(tileMapDispl.x), float(tileMapDispl.y)));
+	isPlayer = true;
 }
 
 void Player::Attack(float damage) {
@@ -150,6 +152,7 @@ void Player::update(int deltaTime)
 {
 	Entity::update(deltaTime);
 	ManageAnims(deltaTime);
+	jumpCounter -= deltaTime;
 	if (!alive) return;
 	bool attacking = sprite->animation() == ATTACK1 || sprite->animation() == ATTACK2;
 	bool rolling = sprite->animation() == ROLL2;
@@ -187,8 +190,9 @@ void Player::update(int deltaTime)
 	if (Game::instance().getSpecialKey(GLUT_ACTIVE_CTRL)) {
 		inp.y -= INPUT_SENSITIVITY;
 	}
-	if (!rolling && !bJumping && Game::instance().getKey('c')) {
+	if (jumpCounter <0 && !rolling && !bJumping && Game::instance().getKey('c')) {
 		sprite->changeAnimation(ROLL);
+		jumpCounter = MAXJUMPCOUNTER;
 		bJumping = true;
 		lastY = transform.GetPosition().y;
 		jumpTime = 0;
@@ -229,6 +233,10 @@ void Player::render()
 void Player::setTileMap(TileMap *tileMap)
 {
 	map = tileMap;
+}
+
+void Player::GetDamage() {
+	sprite->changeAnimation(HIT1);
 }
 
 Player::Player() {

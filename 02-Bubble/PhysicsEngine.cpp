@@ -55,7 +55,7 @@ void PhysicsEngine::solveConflict(Collider * c1, Collider * c2)
 }
 
 bool PhysicsEngine::checkConflict(Collider* c1, Collider* c2){
-	if (!c1->isActive() || !c2->isActive() || c1->l == c2->l) return false;
+	if ( !c1->isActive() || !c2->isActive() || c1->l == c2->l) return false;
 	glm::vec2 pos1 = c1->transform->GetPosition();
 	glm::vec2 pos2 = c2->transform->GetPosition();
 	glm::vec2 ext1 = c2->GetBounds();

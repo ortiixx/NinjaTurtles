@@ -1,6 +1,9 @@
 #include "HammerDamageable.h"
 #include "Scene.h"
 #include "Enemy.h"
+#include "Enemy2.h"
+#include "Enemy3.h"
+#include "Boss1.h"
 
 HammerDamageable::HammerDamageable(float ammount)
 {
@@ -22,4 +25,5 @@ void HammerDamageable::AddDamage(float ammount, glm::fvec2 fDir, int sender)
 void HammerDamageable::Die()
 {
 	Damageable::Die();
+	Scene::encount--;
 }

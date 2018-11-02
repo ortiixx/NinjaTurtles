@@ -25,6 +25,7 @@ public:
 	void Die();
 	int animation() const;
 	float layer = 0;
+	bool customZ;
 
 private:
 	struct Anim {

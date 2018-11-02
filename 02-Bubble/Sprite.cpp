@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+﻿#include <GL/glew.h>
 #include <GL/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Sprite.h"
@@ -74,16 +74,17 @@ void Sprite::update(int deltaTime)
 
 void Sprite::render() const
 {
+	float pos = position.y;	
+	if (customZ) pos = layer;
 	if (!active) return;
 	transform->SetLastPosition(transform->GetPosition());
 	glm::fvec2 scale = transform->GetScale();
 	glm::fvec2 position = transform->GetPosition();
-	glm::mat4 modelview = glm::translate(glm::mat4(1), glm::vec3(position.x, position.y, layer));
+	glm::mat4 modelview = glm::translate(glm::mat4(1), glm::vec3(position.x, position.y, pos));
 	modelview = glm::translate(modelview, glm::vec3(quadSize.x / 2.f, quadSize.y / 2.f, 0.f));
 	modelview = glm::scale(modelview, glm::vec3(scale.x, scale.y, 1.f));
 	modelview = glm::translate(modelview, glm::vec3(-quadSize.x / 2.f, -quadSize.y / 2.f, 0.f));
-
-
+	glEnable(GL_DEPTH_TEST);
 	shaderProgram->setUniformMatrix4f("modelview", modelview);
 	shaderProgram->setUniform2f("texCoordDispl", texCoordDispl.x, texCoordDispl.y);
 	glEnable(GL_TEXTURE_2D);

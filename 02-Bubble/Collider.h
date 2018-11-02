@@ -11,6 +11,7 @@ public:
 		Level
 	};
 	Layer l = Character;
+	bool ignoreScene = false;
 	Collider();
 	Collider(glm::fvec2 bounds);
 	glm::fvec2 GetBounds() { return this->bounds; }

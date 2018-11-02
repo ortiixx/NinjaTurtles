@@ -28,7 +28,9 @@ Enemy::Enemy(ShaderProgram &shaderProgram)
 	currentState = CHASE;
 	tex.loadFromFile("images/Characters/Ninja_pink.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spr = new Sprite(glm::fvec2(128, 128), glm::dvec2(1.f / 5.f, 1.f / 3.f), 5, 4, &tex, &shaderProgram);
-	AddComponent(new Collider(glm::fvec2(128/2, 128/2)));
+	Collider* c = new Collider(glm::fvec2(128/2, 128/2));
+	c->ignoreScene = true;
+	AddComponent(c);
 	AddComponent(new HammerDamageable(300));
 	AddComponent(spr);
 	spr->setAnimation(WALK, 0, 5,13, false);
@@ -52,7 +54,7 @@ glm::fvec2 Enemy::CalculateDir() {
 void Enemy::Attack() {
 	PhysicsEngine* ps = PhysicsEngine::PhysicsGetInstance();
 	glm::fvec2 pos = transform.GetPosition() + CalculateDir();
-	glm::fvec2 bounds = glm::fvec2(128 / 3);
+	glm::fvec2 bounds = glm::fvec2(128/3);
 	std::vector<Collider*> ign;
 	ign.push_back((Collider*)GetComponent("Collider"));
 	std::vector<Collider*> cols = ps->CastCollision(pos, bounds, ign);
@@ -69,7 +71,7 @@ void Enemy::Attack() {
 void Enemy::update(int deltaTime) {
 	Entity::update(deltaTime);
 	if (!alive) return;
-	if (player == nullptr) player = Scene::GetEntity(0); //Player always the first entity
+	if (player == nullptr) player = Scene::GetPlayer(); //Player always the first entity
 
 	if (glm::distance((glm::fvec2)player->transform.GetPosition(), (glm::fvec2)transform.GetPosition()) < ATTACK_DIST) {
 		currentState = ATTACK;

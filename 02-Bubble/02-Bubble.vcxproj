@@ -12,7 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
+    <ClInclude Include="Boss1.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="CombatZone.h" />
     <ClInclude Include="Damageable.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Enemy2.h" />
@@ -21,19 +23,28 @@
     <ClInclude Include="EntityComponent.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HammerDamageable.h" />
+    <ClInclude Include="Icon.h" />
+    <ClInclude Include="Level_1.h" />
+    <ClInclude Include="Level_2.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerDamageable.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Boss1.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CombatZone.cpp" />
     <ClCompile Include="Damageable.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Enemy2.cpp" />
@@ -42,13 +53,20 @@
     <ClCompile Include="EntityComponent.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HammerDamageable.cpp" />
+    <ClCompile Include="Icon.cpp" />
+    <ClCompile Include="Level_1.cpp" />
+    <ClCompile Include="Level_2.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerDamageable.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Transform.cpp" />

@@ -19,7 +19,9 @@ public:
 	virtual void render();
 	void setDead() { alive = false; }
 	void setId(int id);
+	int getId() { return id; }
 	Transform transform;
+	bool isPlayer = false;
 protected:
 	std::vector <EntityComponent*> components;
 	bool alive = true;

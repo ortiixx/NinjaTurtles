@@ -13,8 +13,8 @@
 #define SPEED 100
 #define IMPULSE 1
 #define RECOVERYTIME 1500
-#define HEALTH 100
-#define UNSPAWNCHANCE 10
+#define HEALTH 340
+#define UNSPAWNCHANCE 40
 #define SPAWNCHANCE 70
 #define HIDERATIO 0.6
 #define MAXSPAWNDIST 70
@@ -89,7 +89,7 @@ void Enemy3::Attack() {
 void Enemy3::update(int deltaTime) {
 	Entity::update(deltaTime);
 	hideTimer += (float)deltaTime/1000.f;
-	if (player == nullptr) player = Scene::GetEntity(0); //Player always the first entity
+	if (player == nullptr) player = Scene::GetPlayer(); //Player always the first entity
 	if (!alive) return;
 	glm::fvec2 dir = CalculateDir();
 	glm::fvec2 scale = transform.GetScale();
