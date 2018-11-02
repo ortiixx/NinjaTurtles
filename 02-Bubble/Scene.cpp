@@ -27,6 +27,7 @@ bool Scene::moveC = true;
 Player* Scene::player = nullptr;
 int Scene::encount = 0;
 bool Scene::inCombat = false;
+float Scene::camPX = 0;
 
 std::vector<string> players{
 	"images/Characters/Donatello_gamma.png",
@@ -219,11 +220,12 @@ void Scene::update(int deltaTime)
 			Level_2* level2 = new Level_2(texProgram);
 			player = new Player();
 			PhysicsEngine::Clean();
-			player->init(glm::fvec2(SCREEN_X, SCREEN_Y+100), texProgram,players[selected]);
+			player->init(glm::fvec2(SCREEN_X+20, SCREEN_Y+210), texProgram,players[selected]);
 			AddEntity(level2);
 			AddEntity(player);
 			intro_level_2 = false;
 			level_2 = true;
+			loadlevel2();
 		}
 	}
 	if (level_2){
@@ -306,7 +308,7 @@ void Scene::moveCamera(int deltaTime) {
 	if (!moveC) { camPX = 0; return; }
 	if (player != nullptr) {
 		if (player->GetVel().x < 0) camPX = 0;
-		else camPX = -(float)player->GetVel().x * 1.2 * deltaTime/1000.f;
+		else camPX = -(float)player->GetVel().x * 1.7 * deltaTime/1000.f;
 	}
 }
 
@@ -331,3 +333,27 @@ void Scene::loadlevel1()
 	AddEntity(c5);
 }
 
+void Scene::loadlevel2()
+{
+	Block* b1 = new Block(texProgram);
+	glm::fvec2 p = player->transform.GetPosition();
+	b1->transform.SetPosition(glm::fvec2(SCREEN_X, SCREEN_Y+100));
+	AddEntity(b1);
+	Block* b2 = new Block(texProgram);
+	b2->transform.SetPosition(glm::fvec2(SCREEN_X, SCREEN_Y + 400));
+	AddEntity(b2);
+	CombatZone* c = new CombatZone(p.x + 200, 8, 0, 0, 0, 0, player, texProgram);
+	AddEntity(c);
+	CombatZone* c1 = new CombatZone(p.x + 200, 4, 2, 0, 0, 0, player, texProgram);
+	AddEntity(c1);
+	CombatZone* c2 = new CombatZone(p.x + 200, 10, 0, 2, 0, 0, player, texProgram);
+	AddEntity(c2);
+	CombatZone* c3 = new CombatZone(p.x + 250, 5, 0, 0, 0, 0, player, texProgram);
+	AddEntity(c3);
+	CombatZone* c4 = new CombatZone(p.x + 500, 3, 0, 1, 0, 0, player, texProgram);
+	AddEntity(c4);
+	CombatZone* c5 = new CombatZone(p.x + 800, 0, 1, 6, 0, 0, player, texProgram);
+	AddEntity(c5);
+	CombatZone* c6 = new CombatZone(p.x + 2000, 0, 0, 0, 1, 0, player, texProgram);
+	AddEntity(c6);
+}

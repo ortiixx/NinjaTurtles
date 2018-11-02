@@ -35,17 +35,19 @@ public:
 	static Entity* GetPlayer() { return player; }
 	static int encount;
 	static bool inCombat;
+	static float camPX;
+
 private:
 	void initShaders();
 	void moveCamera(int deltaTime);
 
 private:
 	static bool moveC;
-	float camPX;
 	float camPY;
 	glm::fvec2 lppos;
 	static int lastId;
 	void loadlevel1();
+	void loadlevel2();
 	Menu* menu;
 	TileMap *map;
 	static Player *player;

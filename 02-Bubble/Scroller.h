@@ -6,7 +6,8 @@ class Scroller :
 	public Entity
 {
 public:
-	Scroller(ShaderProgram prog);
+	Scroller(ShaderProgram &prog);
+	void update(int deltaTime);
 	~Scroller();
 	Sprite* spr;
 };

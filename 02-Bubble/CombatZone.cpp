@@ -29,32 +29,32 @@ void CombatZone::Spawn() {
 	Scene::encount += e1 + e2 + e3 + b1 + b2;
 	for (int i = 0; i < e1; i++) {
 		Enemy* e = new Enemy(prog);
-		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, 70);
-		if (i % 2 == 0) pos.x -= SCREEN_WIDTH + rand()%DISPERSION*4;
+		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, player->transform.GetPosition().y);
+		if (i % 2 == 0) pos.x -= SCREEN_WIDTH + rand()%DISPERSION*2;
 		else pos.x += SCREEN_WIDTH + rand()%DISPERSION*4;
 		e->transform.SetPosition(pos);
 		Scene::AddEntity(e);
 	}
 	for (int i = 0; i < e2; i++) {
 		Enemy2* e = new Enemy2(prog);
-		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, 70);
-		if (i % 2 == 0) pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 4;
+		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, player->transform.GetPosition().y);
+		if (i % 2 == 0) pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 2;
 		else pos.x += SCREEN_WIDTH + rand() % DISPERSION * 4;
 		e->transform.SetPosition(pos);
 		Scene::AddEntity(e);
 	}
 	for (int i = 0; i < e3; i++) {
 		Enemy3* e = new Enemy3(prog);
-		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, 70);
-		if (i % 2 == 0) pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 4;
-		else pos.x += SCREEN_WIDTH + rand() % DISPERSION * 4;
+		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, player->transform.GetPosition().y);
+		if (i % 2 == 0) pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 2;
+		else pos.x += SCREEN_WIDTH + rand() % DISPERSION * 2;
 		e->transform.SetPosition(pos);
 		Scene::AddEntity(e);
 	}
 	if (b1 != 0) {
 		Boss1* b = new Boss1(prog);
-		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, 70);
-		pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 4; 4;
+		glm::fvec2 pos = glm::fvec2(player->transform.GetPosition().x, player->transform.GetPosition().y);
+		pos.x -= SCREEN_WIDTH / 2 - rand() % DISPERSION * 2;
 		b->transform.SetPosition(pos);
 		Scene::AddEntity(b);
 	}

@@ -23,6 +23,7 @@ public:
 	void changeAnimation(int animId);
 	void setDieAnim(int anim) { dieAnim = anim; }
 	void Die();
+	glm::fvec2 getCoord(){ return texCoordDispl; }
 	int animation() const;
 	float layer = 0;
 	bool customZ;
